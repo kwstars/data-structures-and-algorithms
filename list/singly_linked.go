@@ -1,113 +1,109 @@
 package main
 
 import (
-	"errors"
-	"fmt"
-	"sync"
+	"github.com/isdamir/gotype"
 )
 
-type Node struct {
-	value interface{}
-	next  *Node
+// Reverse Linklist
+func Reverse(node *gotype.LNode) {
+	if node == nil || node.Next == nil {
+		return
+	}
+
+	var (
+		pre *gotype.LNode
+		cur *gotype.LNode
+	)
+
+	next := node.Next
+	for next != nil {
+		cur = next.Next
+		next.Next = pre
+		pre = next
+		next = cur
+	}
+	node.Next = pre
+
 }
 
-func (n *Node) Next() *Node {
-	return n.next
-}
+// RemoveDup Remove duplicate items from an unordered linklist
+func RemoveDup(head *gotype.LNode) {
+	if head == nil || head.Next == nil {
+		return
+	}
 
-type SinglyLinkedList struct {
-	head *Node
-	len  int
-	lock sync.RWMutex
-}
+	outerCur := head.Next
+	var (
+		innerCur *gotype.LNode
+		innerPre *gotype.LNode
+	)
 
-func NewSinglyLinked() *SinglyLinkedList {
-	return &SinglyLinkedList{}
-}
-
-func (s *SinglyLinkedList) Append(n *Node) {
-	if s.head == nil {
-		s.head = n
-	} else {
-		current := s.head
-		for current.next != nil {
-			current = current.next
+	for ; outerCur != nil; outerCur = outerCur.Next {
+		for innerCur, innerPre = outerCur.Next, outerCur; innerCur != nil; {
+			if outerCur.Data == innerCur.Data {
+				innerPre.Next = innerCur.Next
+				innerCur = innerCur.Next
+			} else {
+				innerPre = innerCur
+				innerCur = innerCur.Next
+			}
 		}
-		current.next = n
 	}
-
-	s.len++
 }
 
-func (s *SinglyLinkedList) Prepend(n *Node) {
-	if s.head == nil {
-		s.head = n
-	} else {
-		n.next = s.head
-		s.head = n
-	}
-	s.len++
-}
-
-func (s *SinglyLinkedList) GetHead() *Node {
-	return s.head
-}
-
-func (s *SinglyLinkedList) GetBack() *Node {
-	current := s.head
-	if current != nil && current.next != nil {
-		current = current.next
-	}
-	return current
-}
-
-func (s *SinglyLinkedList) Traverse() error {
-	if s.head == nil {
-		return errors.New("TraverseError: List is empty")
+// Add Summing two lined list
+func Add(l1 *gotype.LNode, l2 *gotype.LNode) (head *gotype.LNode) {
+	if l1 == nil || l1.Next == nil {
+		return l2
 	}
 
-	current := s.head
-	for current != nil {
-		fmt.Printf(" %v ->", current.value)
-		current = current.next
+	if l2 == nil || l2.Next == nil {
+		return l1
 	}
 
-	return nil
-}
+	c := 0
+	sum := 0
+	p1 := l1.Next
+	p2 := l2.Next
+	resultHead := &gotype.LNode{}
+	p := resultHead
 
-func (s *SinglyLinkedList) Reverse() {
-	curr := s.head
-	var prev *Node
-	for curr != nil {
-		next := curr.next
-		curr.next = prev
-		prev = curr
-		curr = next
-	}
-	s.head = prev
-}
-
-func main() {
-	l := NewSinglyLinked()
-	l.Append(&Node{
-		value: "a",
-	})
-	l.Append(&Node{
-		value: "b",
-	})
-	l.Append(&Node{
-		value: 1111,
-	})
-	l.Prepend(&Node{
-		value: 1})
-
-	if err := l.Traverse(); err != nil {
-		fmt.Println(err)
+	for p1 != nil && p2 != nil {
+		p.Next = &gotype.LNode{}
+		sum = p1.Data.(int) + p2.Data.(int) + c
+		p.Next.Data = sum % 10
+		c = sum / 10
+		p = p.Next
+		p1 = p1.Next
+		p2 = p2.Next
 	}
 
-	l.Reverse()
-	fmt.Println()
-	if err := l.Traverse(); err != nil {
-		fmt.Println(err)
+	if p1 == nil {
+		for p2 != nil {
+			p.Next = &gotype.LNode{}
+			sum = p2.Data.(int) + c
+			p.Next.Data = sum % 10
+			c = sum / 10
+			p = p.Next
+			p2 = p2.Next
+		}
 	}
+
+	if p2 == nil {
+		for p1 != nil {
+			p.Next = &gotype.LNode{}
+			sum = p1.Data.(int) + c
+			p.Next.Data = sum % 10
+			c = sum / 10
+			p = p.Next
+			p1 = p1.Next
+		}
+	}
+
+	if c == 1 {
+		p.Next = &gotype.LNode{}
+		p.Next.Data = 1
+	}
+
+	return resultHead
 }
