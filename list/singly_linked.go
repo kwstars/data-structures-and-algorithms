@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/isdamir/gotype"
 )
 
@@ -106,4 +107,35 @@ func Add(l1 *gotype.LNode, l2 *gotype.LNode) (head *gotype.LNode) {
 	}
 
 	return resultHead
+}
+
+func FindLastK(head *gotype.LNode, k int) (*gotype.LNode, error) {
+	if head == nil || head.Next == nil {
+		return head, nil
+	}
+
+	var (
+		i    = 0
+		slow = head.Next
+		fast = head.Next
+	)
+
+	for ; i < k && fast != nil; i++ {
+		fast = fast.Next
+	}
+
+	if i < k {
+		return nil, errors.New("linkedList too short")
+	}
+
+	for fast != nil {
+		slow = slow.Next
+		fast = fast.Next
+	}
+
+	if slow == nil {
+		return nil, errors.New("Not found")
+	}
+
+	return slow, nil
 }
